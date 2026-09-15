@@ -304,7 +304,14 @@ class Voice {
       this.sound.playSound("userJoinVoice");
     });
 
-    room.addListener("disconnected", () => this.#setState("DISCONNECTED"));
+    room.addListener("disconnected", () => {
+      this.#setState("DISCONNECTED");
+
+      // Covers involuntary disconnects (network drop, kick, server shutdown);
+      // an explicit disconnect() detaches its listeners first and plays the
+      // sound itself, so this cannot double up.
+      this.sound.playSound("userLeaveVoice");
+    });
 
     room.addListener("localTrackPublished", (pub) => {
       if (pub.audioTrack && pub.audioTrack.source === Track.Source.Microphone) {

@@ -17,6 +17,13 @@ import userLeaveVoiceSound from "../../public/assets/sounds/user_leave_voice.ogg
 import userMovedSound from "../../public/assets/sounds/user_moved.ogg";
 
 /**
+ * Playback volume used for every notification sound.
+ *
+ * Kept moderate so that call join/leave cues do not overpower voice audio.
+ */
+const SOUND_VOLUME = 0.4;
+
+/**
  * A controller class for making sure sounds are managed in one place and to prevent undesirable sound overlaps
  */
 export class SoundController {
@@ -135,6 +142,7 @@ export class SoundController {
       }
     }
     this.lastPlayedSound = sound;
+    this.node.volume = SOUND_VOLUME;
     this.node.play();
     return true;
   }
