@@ -19,7 +19,7 @@ jobs:
     name: Build Docker Image
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm]
+        os: [ubuntu-latest]
         exclude:
           - os: ${{ github.event_name == 'pull_request' && 'ubuntu-24.04-arm' || '' }}
     runs-on: ${{ matrix.os }}
