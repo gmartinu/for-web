@@ -125,7 +125,12 @@ export function VoiceCallCardContext(props: { children: JSX.Element }) {
     } else if (inf?.pos && (!inf.drawer || inf.drawer === SlideState.SHOWN)) {
       sty.transform = `translate(${inf.pos.x}px, ${inf.pos.y}px)`;
       sty.width = `${inf.pos.width}px`;
-      sty.height = voice.layout() === "collapsed" ? "56px" : "";
+      sty.height =
+        voice.layout() === "collapsed"
+          ? "56px"
+          : inf.pos.height > 1
+            ? `${inf.pos.height}px`
+            : "";
       setMode();
     } else if (!inCall()) {
       const y = inf?.pos.y ?? ref.getBoundingClientRect().y;
@@ -244,7 +249,11 @@ const Float = styled("div", {
 });
 
 /** 'Marker' to send position information for mounting the floating call card */
-export function VoiceChannelCallCardMount(props: { channel: Channel }) {
+export function VoiceChannelCallCardMount(props: {
+  channel: Channel;
+  /** Whether this marker should take up all remaining space in its parent */
+  fill?: boolean;
+}) {
   const voice = useVoice();
   const state = useState();
   const setInfo = useContext(callCardContext)!;
@@ -271,12 +280,20 @@ export function VoiceChannelCallCardMount(props: { channel: Channel }) {
     if (!target) return;
 
     createResizeObserver(target, updateInfo);
+    createResizeObserver(ref!, updateInfo);
   });
   onCleanup(() => {
     setInfo();
   });
 
-  return <div ref={ref!} />;
+  return (
+    <div
+      ref={ref!}
+      style={
+        props.fill ? { flex: "1", "min-height": "0" } : { "flex-shrink": "0" }
+      }
+    />
+  );
 }
 
 /**

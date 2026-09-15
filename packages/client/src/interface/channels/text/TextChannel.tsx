@@ -8,6 +8,7 @@ import {
   onCleanup,
 } from "solid-js";
 
+import { useLingui } from "@lingui/solid/macro";
 import { cva } from "styled-system/css";
 import { styled } from "styled-system/jsx";
 import { decodeTime, ulid } from "ulid";
@@ -26,6 +27,7 @@ import {
   main,
 } from "@revolt/ui";
 import { VoiceChannelCallCardMount } from "@revolt/ui/components/features/voice/callCard/VoiceCallCard";
+import { Symbol } from "@revolt/ui/components/utils/Symbol";
 
 import { ChannelHeader } from "../ChannelHeader";
 import { ChannelPageProps } from "../ChannelPage";
@@ -75,6 +77,14 @@ const LARGE_SERVERS = [
 export function TextChannel(props: ChannelPageProps) {
   const state = useState();
   const client = useClient();
+  const { t } = useLingui();
+
+  /**
+   * Whether the text chat below the call card is currently shown
+   */
+  const textChatVisible = () =>
+    !canConnect() ||
+    state.layout.getSectionState(LAYOUT_SECTIONS.VOICE_TEXT_CHAT, true);
 
   // Last unread message id
   const [lastId, setLastId] = createSignal<string>();
@@ -215,29 +225,58 @@ export function TextChannel(props: ChannelPageProps) {
               </BelowFloatingHeader>
             }
           >
-            <VoiceChannelCallCardMount channel={props.channel} />
+            <VoiceChannelCallCardMount
+              channel={props.channel}
+              fill={!textChatVisible()}
+            />
           </Show>
 
-          <Messages
-            channel={props.channel}
-            lastReadId={lastId}
-            pendingMessages={(pendingProps) => (
-              <DraftMessages
-                channel={props.channel}
-                tail={pendingProps.tail}
-                sentIds={pendingProps.ids}
-              />
-            )}
-            highlightedMessageId={highlightMessageId}
-            clearHighlightedMessage={() => navigate(".")}
-            jumpToBottomRef={(ref) => (jumpToBottomRef = ref)}
-            atEnd={[atEnd, setEnd]}
-          />
+          <Show when={textChatVisible()}>
+            <Messages
+              channel={props.channel}
+              lastReadId={lastId}
+              pendingMessages={(pendingProps) => (
+                <DraftMessages
+                  channel={props.channel}
+                  tail={pendingProps.tail}
+                  sentIds={pendingProps.ids}
+                />
+              )}
+              highlightedMessageId={highlightMessageId}
+              clearHighlightedMessage={() => navigate(".")}
+              jumpToBottomRef={(ref) => (jumpToBottomRef = ref)}
+              atEnd={[atEnd, setEnd]}
+            />
 
-          <MessageComposition
-            channel={props.channel}
-            onMessageSend={() => jumpToBottomRef?.()}
-          />
+            <MessageComposition
+              channel={props.channel}
+              onMessageSend={() => jumpToBottomRef?.()}
+            />
+          </Show>
+
+          <Show when={canConnect()}>
+            <ChatToggle
+              type="button"
+              collapsed={!textChatVisible()}
+              title={textChatVisible() ? t`Hide text chat` : t`Show text chat`}
+              aria-label={
+                textChatVisible() ? t`Hide text chat` : t`Show text chat`
+              }
+              aria-expanded={textChatVisible()}
+              onClick={() =>
+                state.layout.toggleSectionState(
+                  LAYOUT_SECTIONS.VOICE_TEXT_CHAT,
+                  true,
+                )
+              }
+            >
+              <Symbol size={18}>
+                {textChatVisible()
+                  ? "keyboard_arrow_down"
+                  : "keyboard_arrow_up"}
+              </Symbol>
+            </ChatToggle>
+          </Show>
         </main>
         <Show
           when={
@@ -315,6 +354,41 @@ export function TextChannel(props: ChannelPageProps) {
 /**
  * Main content row layout
  */
+/**
+ * Discreet toggle for showing/hiding the text chat in a voice channel
+ */
+const ChatToggle = styled("button", {
+  base: {
+    all: "unset",
+    flexShrink: 0,
+    cursor: "pointer",
+
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    height: "16px",
+    marginBottom: "var(--gap-sm)",
+    borderRadius: "var(--borderRadius-full)",
+
+    color: "var(--md-sys-color-on-surface-variant)",
+    opacity: 0.5,
+    transition: "var(--transitions-fast) all",
+
+    "&:hover": {
+      opacity: 1,
+      background: "var(--md-sys-color-surface-container-high)",
+    },
+  },
+  variants: {
+    collapsed: {
+      true: {
+        opacity: 0.8,
+      },
+    },
+  },
+});
+
 const Content = styled("div", {
   base: {
     display: "flex",
