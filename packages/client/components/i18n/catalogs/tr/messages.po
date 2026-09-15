@@ -492,6 +492,11 @@ msgstr "Otomatik Kazanç Kontrolü"
 msgid "Avatar"
 msgstr "Profil Resmi"
 
+#. placeholder {0}: average()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Average ping: {0} ms"
+msgstr ""
+
 #: components/app/interface/settings/user/_AccountCard.tsx
 #: components/auth/src/flows/FlowCheck.tsx
 #: components/auth/src/flows/FlowCreate.tsx
@@ -844,6 +849,10 @@ msgstr "Kod"
 msgid "Collapse call window"
 msgstr ""
 
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Collecting data…"
+msgstr ""
+
 #: components/ui/components/features/voice/callCard/VoiceCallCardActions.tsx
 msgid "Coming soon! 👀"
 msgstr "Çok yakında geliyor! 👀"
@@ -880,6 +889,10 @@ msgstr "Bağlanıldı"
 #: components/ui/components/features/voice/callCard/VoiceCallCardStatus.tsx
 msgid "Connecting"
 msgstr "Bağlanıyor"
+
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Connection"
+msgstr ""
 
 #. placeholder {0}: props.discoverable instanceof Bot ? "bot" : "server"
 #: components/app/interface/settings/shared/Discoverable.tsx
@@ -1706,6 +1719,10 @@ msgstr "İşte yeni davet kodun: <0>{0}</0>"
 msgid "Hide Others"
 msgstr "Diyerlerini Gizle"
 
+#: src/interface/channels/text/TextChannel.tsx
+msgid "Hide text chat"
+msgstr ""
+
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "High Contrast"
 msgstr "Yüksek Kontrast"
@@ -1810,6 +1827,11 @@ msgstr "alakasız mizah rozeti 2"
 msgid "ISO Standard (YYYY-MM-DD)"
 msgstr "ISO Standartı (YYYY-AA-GG)"
 
+#. placeholder {0}: jitter()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Jitter: {0} ms"
+msgstr ""
+
 #: components/modal/modals/Invite.tsx
 #: components/modal/modals/JoinServer.tsx
 msgid "Join"
@@ -1873,6 +1895,11 @@ msgstr "Üyeleri At"
 #: components/app/interface/settings/UserSettings.tsx
 msgid "Language"
 msgstr "Dil"
+
+#. placeholder {0}: last()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Last ping: {0} ms"
+msgstr ""
 
 #: components/app/interface/settings/user/Sync.tsx
 msgid "Last sync <0/>"
@@ -2274,6 +2301,10 @@ msgstr "Bu platformu kullanmak için gereken yaşta değil"
 msgid "Notifications"
 msgstr "Bildirimler"
 
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "now"
+msgstr ""
+
 #: components/ui/components/features/messaging/composition/MessageReplyPreview.tsx
 msgid "Off"
 msgstr "Kapalı"
@@ -2570,6 +2601,11 @@ msgstr "Sekme açıkken bildirimler gelsin."
 msgid "Receive push notifications while the app is closed."
 msgstr "Uyguluma kapalıyken bildirimler gelsin."
 
+#. placeholder {0}: loss()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Received packet loss rate: {0}%"
+msgstr ""
+
 #: components/ui/components/features/voice/callCard/VoiceCallCardStatus.tsx
 msgid "Reconnecting"
 msgstr "Tekrardan Bağlanılıyor"
@@ -2782,6 +2818,10 @@ msgstr "Roller"
 msgid "Roles with No Overrides"
 msgstr ""
 
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Round trip time over the last five minutes"
+msgstr ""
+
 #. placeholder {0}: rtt()
 #. placeholder {1}: loss()
 #. placeholder {2}: jitter()
@@ -2930,6 +2970,11 @@ msgstr "Bir eklenti gönderildi"
 msgid "Sent multiple attachments"
 msgstr "Birden fazla eklenti gönderildi"
 
+#. placeholder {0}: loss()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Sent packet loss rate: {0}%"
+msgstr ""
+
 #: components/modal/modals/ServerIdentity.tsx
 msgid "Server Avatar"
 msgstr "Sunucu Profil Resmi"
@@ -3016,6 +3061,10 @@ msgstr "Diğerlerine göster"
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "Show send message button"
 msgstr "Mesaj gönder butonunu göster"
+
+#: src/interface/channels/text/TextChannel.tsx
+msgid "Show text chat"
+msgstr ""
 
 #: components/auth/src/flows/FlowLogin.tsx
 msgid "Sign into Stoat"
@@ -3831,6 +3880,10 @@ msgstr "Bağlantı sorunları yaşıyor olabilirsiniz."
 
 #: components/i18n/errors.tsx
 msgid "You may not submit this item to discover."
+msgstr ""
+
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "You may notice audio delay above {LAG_THRESHOLD} ms."
 msgstr ""
 
 #: components/ui/components/features/voice/VoiceStatefulUserIcons.tsx

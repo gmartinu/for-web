@@ -491,6 +491,11 @@ msgstr "Regulação automática de volume"
 msgid "Avatar"
 msgstr "Avatar"
 
+#. placeholder {0}: average()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Average ping: {0} ms"
+msgstr ""
+
 #: components/app/interface/settings/user/_AccountCard.tsx
 #: components/auth/src/flows/FlowCheck.tsx
 #: components/auth/src/flows/FlowCreate.tsx
@@ -843,6 +848,10 @@ msgstr "Código"
 msgid "Collapse call window"
 msgstr ""
 
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Collecting data…"
+msgstr ""
+
 #: components/ui/components/features/voice/callCard/VoiceCallCardActions.tsx
 msgid "Coming soon! 👀"
 msgstr "Brevemente! 👀"
@@ -879,6 +888,10 @@ msgstr "Conectado"
 #: components/ui/components/features/voice/callCard/VoiceCallCardStatus.tsx
 msgid "Connecting"
 msgstr "A conectar"
+
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Connection"
+msgstr ""
 
 #. placeholder {0}: props.discoverable instanceof Bot ? "bot" : "server"
 #: components/app/interface/settings/shared/Discoverable.tsx
@@ -1700,6 +1713,10 @@ msgstr "Aqui está o teu novo código de convite: <0>{0}</0>"
 msgid "Hide Others"
 msgstr "Esconder outros"
 
+#: src/interface/channels/text/TextChannel.tsx
+msgid "Hide text chat"
+msgstr ""
+
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "High Contrast"
 msgstr "Contraste alto"
@@ -1804,6 +1821,11 @@ msgstr "2ª medalha de piada irrelevante"
 msgid "ISO Standard (YYYY-MM-DD)"
 msgstr "'Standard' ISO (YYYY-MM-DD)"
 
+#. placeholder {0}: jitter()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Jitter: {0} ms"
+msgstr ""
+
 #: components/modal/modals/Invite.tsx
 #: components/modal/modals/JoinServer.tsx
 msgid "Join"
@@ -1867,6 +1889,11 @@ msgstr "Expulsar membros"
 #: components/app/interface/settings/UserSettings.tsx
 msgid "Language"
 msgstr "Idioma"
+
+#. placeholder {0}: last()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Last ping: {0} ms"
+msgstr ""
 
 #: components/app/interface/settings/user/Sync.tsx
 msgid "Last sync <0/>"
@@ -2268,6 +2295,10 @@ msgstr "Não tem idade mínima para utilizar a plataforma"
 msgid "Notifications"
 msgstr "Notificações"
 
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "now"
+msgstr ""
+
 #: components/ui/components/features/messaging/composition/MessageReplyPreview.tsx
 msgid "Off"
 msgstr "Desligado"
@@ -2564,6 +2595,11 @@ msgstr "receber notificações enquanto o separador está aberto."
 msgid "Receive push notifications while the app is closed."
 msgstr "Receber notificações enquanto a aplicação está fechada."
 
+#. placeholder {0}: loss()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Received packet loss rate: {0}%"
+msgstr ""
+
 #: components/ui/components/features/voice/callCard/VoiceCallCardStatus.tsx
 msgid "Reconnecting"
 msgstr "Religando"
@@ -2776,6 +2812,10 @@ msgstr "Papéis (roles)"
 msgid "Roles with No Overrides"
 msgstr "Papéis sem excepções"
 
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Round trip time over the last five minutes"
+msgstr ""
+
 #. placeholder {0}: rtt()
 #. placeholder {1}: loss()
 #. placeholder {2}: jitter()
@@ -2924,6 +2964,11 @@ msgstr "Enviou um anexo"
 msgid "Sent multiple attachments"
 msgstr "Enviou vários anexos"
 
+#. placeholder {0}: loss()
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "Sent packet loss rate: {0}%"
+msgstr ""
+
 #: components/modal/modals/ServerIdentity.tsx
 msgid "Server Avatar"
 msgstr "Avatar do servidor"
@@ -3009,6 +3054,10 @@ msgstr "Mostrar outros"
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "Show send message button"
 msgstr "Mostrar butão de enviar mensagem"
+
+#: src/interface/channels/text/TextChannel.tsx
+msgid "Show text chat"
+msgstr ""
 
 #: components/auth/src/flows/FlowLogin.tsx
 msgid "Sign into Stoat"
@@ -3822,6 +3871,10 @@ msgstr "Podes estar a experiênciar problemas de ligação."
 
 #: components/i18n/errors.tsx
 msgid "You may not submit this item to discover."
+msgstr ""
+
+#: components/ui/components/features/voice/ConnectionStatsPopover.tsx
+msgid "You may notice audio delay above {LAG_THRESHOLD} ms."
 msgstr ""
 
 #: components/ui/components/features/voice/VoiceStatefulUserIcons.tsx
