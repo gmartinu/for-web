@@ -2,6 +2,16 @@ import { getVirtmic } from "./virtualMic";
 
 export { useVoice, VoiceContext } from "./state";
 
+export {
+  AUDIO_BITRATE_STEP,
+  AUDIO_BITRATE_WARN_THRESHOLD,
+  DEFAULT_AUDIO_BITRATE,
+  getChannelMaxBitrate,
+  getChannelVoiceInfo,
+  MAX_AUDIO_BITRATE,
+  MIN_AUDIO_BITRATE,
+} from "./bitrate";
+
 export { InRoom } from "./components/InRoom";
 export { RoomAudioManager } from "./components/RoomAudioManager";
 export { useConnectionStats } from "./useConnectionStats";

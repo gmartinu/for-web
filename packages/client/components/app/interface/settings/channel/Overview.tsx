@@ -1,5 +1,5 @@
 import { createFormControl, createFormGroup } from "solid-forms";
-import { Match, Show, Switch } from "solid-js";
+import { Match, Show, Switch, createSignal, onMount } from "solid-js";
 
 import { Trans, useLingui } from "@lingui/solid/macro";
 import type { API } from "stoat.js";
@@ -9,12 +9,22 @@ import { useDurationFormat } from "@revolt/i18n/durations";
 import { useInstance } from "@revolt/instance";
 import { useModals } from "@revolt/modal";
 import {
+  AUDIO_BITRATE_STEP,
+  AUDIO_BITRATE_WARN_THRESHOLD,
+  DEFAULT_AUDIO_BITRATE,
+  MAX_AUDIO_BITRATE,
+  MIN_AUDIO_BITRATE,
+  getChannelVoiceInfo,
+  useVoice,
+} from "@revolt/rtc";
+import {
   Button,
   CircularProgress,
   Column,
   Form2,
   MenuItem,
   Row,
+  Slider,
   Text,
 } from "@revolt/ui";
 
@@ -29,6 +39,19 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
   const { openModal } = useModals();
   const instance = useInstance();
   const duration = useDurationFormat();
+  const voice = useVoice();
+
+  // eslint-disable-next-line solid/reactivity
+  const isVoiceChannel = props.channel.isVoice;
+
+  /**
+   * Voice information as currently stored on the channel; `max_bitrate` is not
+   * hydrated by stoat.js, so it is fetched from the API.
+   */
+  const [voiceInfo, setVoiceInfo] = createSignal<{
+    max_users?: number | null;
+    max_bitrate?: number | null;
+  }>();
 
   /* eslint-disable solid/reactivity */
   // we want to take the initial value only
@@ -41,8 +64,23 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
     slowmode: createFormControl<string>(
       props.channel.slowmode.toString() ?? "0",
     ),
+    bitrate: createFormControl<number>(DEFAULT_AUDIO_BITRATE),
   });
   /* eslint-enable solid/reactivity */
+
+  onMount(() => {
+    if (!isVoiceChannel) return;
+
+    getChannelVoiceInfo(client(), props.channel.id)
+      .then((info) => {
+        setVoiceInfo(info);
+        editGroup.controls.bitrate.setValue(
+          info?.max_bitrate ?? DEFAULT_AUDIO_BITRATE,
+        );
+        editGroup.controls.bitrate.markDirty(false);
+      })
+      .catch(() => void 0);
+  });
 
   function onReset() {
     editGroup.controls.name.setValue(props.channel.name);
@@ -51,6 +89,10 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
     editGroup.controls.slowmode.setValue(
       props.channel.slowmode.toString() ?? "0",
     );
+    editGroup.controls.bitrate.setValue(
+      voiceInfo()?.max_bitrate ?? DEFAULT_AUDIO_BITRATE,
+    );
+    editGroup.controls.bitrate.markDirty(false);
   }
 
   async function onSubmit() {
@@ -96,7 +138,25 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
       changes.slowmode = Number(editGroup.controls.slowmode.value);
     }
 
+    const bitrate = editGroup.controls.bitrate.value;
+    const bitrateChanged = isVoiceChannel && editGroup.controls.bitrate.isDirty;
+
+    if (bitrateChanged) {
+      // `voice` is typed without `max_bitrate` in stoat-api; keep the other
+      // voice fields intact when patching
+      changes.voice = {
+        ...voiceInfo(),
+        max_bitrate: bitrate,
+      } as NonNullable<API.DataEditChannel["voice"]>;
+    }
+
     await props.channel.edit(changes);
+
+    if (bitrateChanged) {
+      setVoiceInfo((info) => ({ ...info, max_bitrate: bitrate }));
+      editGroup.controls.bitrate.markDirty(false);
+      await voice.updateChannelMaxBitrate(props.channel.id, bitrate);
+    }
   }
 
   const submit = Form2.useSubmitHandler(editGroup, onSubmit, onReset);
@@ -150,6 +210,50 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
               <MenuItem value="7200">{duration({ hours: 2 })}</MenuItem>
               <MenuItem value="21600">{duration({ hours: 6 })}</MenuItem>
             </Form2.Select>
+          </Show>
+          <Show when={isVoiceChannel}>
+            <Text class="label">
+              <Trans>Bitrate</Trans>
+            </Text>
+            <Slider
+              min={MIN_AUDIO_BITRATE}
+              max={MAX_AUDIO_BITRATE}
+              step={AUDIO_BITRATE_STEP}
+              tickmarks
+              value={editGroup.controls.bitrate.value}
+              labelFormatter={(value) => `${Math.round(value / 1000)} kbps`}
+              onInput={(event) => {
+                editGroup.controls.bitrate.setValue(
+                  Number(event.currentTarget.value),
+                );
+                editGroup.controls.bitrate.markDirty(
+                  Number(event.currentTarget.value) !==
+                    (voiceInfo()?.max_bitrate ?? DEFAULT_AUDIO_BITRATE),
+                );
+              }}
+            />
+            <div
+              style={{ display: "flex", "justify-content": "space-between" }}
+            >
+              <Text class="label">8</Text>
+              <Text class="label">64</Text>
+              <Text class="label">96</Text>
+            </div>
+            <Text>
+              {t`${Math.round(editGroup.controls.bitrate.value / 1000)} kbps`}
+            </Text>
+            <Show
+              when={
+                editGroup.controls.bitrate.value > AUDIO_BITRATE_WARN_THRESHOLD
+              }
+            >
+              <Text>
+                <Trans>
+                  Going above 64 kbps may negatively affect people with poor
+                  connections.
+                </Trans>
+              </Text>
+            </Show>
           </Show>
           <Row>
             <Form2.Reset group={editGroup} onReset={onReset} />

@@ -91,6 +91,11 @@ msgstr "{0} is aan het typen…"
 msgid "{0} joined"
 msgstr "{0} sloot zich aan"
 
+#. placeholder {0}: Math.round(editGroup.controls.bitrate.value / 1000)
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "{0} kbps"
+msgstr ""
+
 #. placeholder {0}: (message.systemMessage as UserSystemMessage).user?.username
 #: components/client/NotificationsWorker.tsx
 msgid "{0} left"
@@ -572,6 +577,10 @@ msgstr "Banner"
 #: components/app/interface/settings/ServerSettings.tsx
 msgid "Bans"
 msgstr "Verbanningen"
+
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "Bitrate"
+msgstr ""
 
 #: components/app/menus/UserContextMenu.tsx
 msgid "Block user"
@@ -1687,6 +1696,10 @@ msgstr "Ga naar de Stoat Lounge"
 
 #~ msgid "Go to the testers server"
 #~ msgstr "Ga naar de testers-server"
+
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "Going above 64 kbps may negatively affect people with poor connections."
+msgstr ""
 
 #: components/modal/modals/Onboarding.tsx
 msgid "Good"

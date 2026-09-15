@@ -91,6 +91,11 @@ msgstr "{0} yazıyor…"
 msgid "{0} joined"
 msgstr "{0} katıldı"
 
+#. placeholder {0}: Math.round(editGroup.controls.bitrate.value / 1000)
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "{0} kbps"
+msgstr ""
+
 #. placeholder {0}: (message.systemMessage as UserSystemMessage).user?.username
 #: components/client/NotificationsWorker.tsx
 msgid "{0} left"
@@ -550,6 +555,10 @@ msgstr "Afiş"
 #: components/app/interface/settings/ServerSettings.tsx
 msgid "Bans"
 msgstr "Yasaklananlar"
+
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "Bitrate"
+msgstr ""
 
 #: components/app/menus/UserContextMenu.tsx
 msgid "Block user"
@@ -1659,6 +1668,10 @@ msgstr "Stoat Resmi Sunucusuna Gidin"
 
 #~ msgid "Go to the testers server"
 #~ msgstr "Test edenler sunucusuna git"
+
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "Going above 64 kbps may negatively affect people with poor connections."
+msgstr ""
 
 #: components/modal/modals/Onboarding.tsx
 msgid "Good"

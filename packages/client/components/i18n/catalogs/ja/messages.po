@@ -88,6 +88,11 @@ msgstr "{0} が入力中…"
 msgid "{0} joined"
 msgstr "{0} が参加しました"
 
+#. placeholder {0}: Math.round(editGroup.controls.bitrate.value / 1000)
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "{0} kbps"
+msgstr ""
+
 #. placeholder {0}: (message.systemMessage as UserSystemMessage).user?.username
 #: components/client/NotificationsWorker.tsx
 msgid "{0} left"
@@ -492,6 +497,10 @@ msgstr "バナー"
 #: components/app/interface/settings/ServerSettings.tsx
 msgid "Bans"
 msgstr "BANされたユーザー"
+
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "Bitrate"
+msgstr ""
 
 #: components/app/menus/UserContextMenu.tsx
 msgid "Block user"
@@ -1587,6 +1596,10 @@ msgstr "Stoat Loungeを開く"
 
 #~ msgid "Go to the testers server"
 #~ msgstr "テスターサーバーに移動する"
+
+#: components/app/interface/settings/channel/Overview.tsx
+msgid "Going above 64 kbps may negatively affect people with poor connections."
+msgstr ""
 
 #: components/modal/modals/Onboarding.tsx
 msgid "Good"
