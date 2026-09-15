@@ -21,6 +21,7 @@ import { Row } from "@revolt/ui/components/layout";
 import { OverflowingText } from "@revolt/ui/components/utils";
 import { Symbol } from "@revolt/ui/components/utils/Symbol";
 
+import { ConnectionQualityBadge } from "../ConnectionQualityBadge";
 import { VoiceStatefulUserIcons } from "../VoiceStatefulUserIcons";
 
 type TileProps = {
@@ -162,11 +163,14 @@ export function ParticipantTile(props: TileProps) {
                   </Symbol>
                 </Show>
               ) : (
-                <VoiceStatefulUserIcons
-                  userId={participant.identity}
-                  muted={isMuted()}
-                  camera={isVideo()}
-                />
+                <>
+                  <VoiceStatefulUserIcons
+                    userId={participant.identity}
+                    muted={isMuted()}
+                    camera={isVideo()}
+                  />
+                  <ConnectionQualityBadge />
+                </>
               )}
             </Row>
           </OverlayInner>
