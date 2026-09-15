@@ -10,6 +10,8 @@ import { useConnectionStats } from "@revolt/rtc";
 
 import { Symbol } from "../../utils/Symbol";
 
+import { ConnectionStatsPopover } from "./ConnectionStatsPopover";
+
 /**
  * Icon used for each connection quality bucket.
  */
@@ -32,14 +34,15 @@ const COLOURS: Partial<Record<ConnectionQuality, string>> = {
 
 /**
  * Small connection quality indicator for a participant, with a tooltip
- * breaking down round trip time, packet loss and jitter.
+ * breaking down round trip time, packet loss and jitter, and a popover
+ * graphing the round trip time over time when clicked.
  */
 export function ConnectionQualityBadge() {
   const { t } = useLingui();
   const participant = useEnsureParticipant();
   const stats = useConnectionStats(participant);
 
-  const unknown = "\u2014";
+  const unknown = "—";
 
   const rtt = () => {
     const value = stats().rtt;
@@ -61,18 +64,28 @@ export function ConnectionQualityBadge() {
 
   return (
     <Show when={stats().quality !== ConnectionQuality.Unknown}>
-      <Symbol
-        size={16}
-        color={COLOURS[stats().quality]}
+      {/* the directive has to live on a real element: `Symbol` renders a
+          Panda styled component, which would only spread it as an attribute */}
+      <span
+        style={{ display: "flex", cursor: "pointer" }}
         use:floating={{
           tooltip: {
             placement: "top",
             content: tooltip(),
           },
+          contextMenu: () => (
+            <ConnectionStatsPopover
+              stats={stats}
+              isLocal={participant.isLocal}
+            />
+          ),
+          contextMenuHandler: "click",
         }}
       >
-        {SYMBOLS[stats().quality]}
-      </Symbol>
+        <Symbol size={16} color={COLOURS[stats().quality]}>
+          {SYMBOLS[stats().quality]}
+        </Symbol>
+      </span>
     </Show>
   );
 }

@@ -11,6 +11,13 @@ import {
 /**
  * Connection statistics for a single participant.
  */
+export type RttSample = {
+  /** When the sample was taken (epoch milliseconds) */
+  timestamp: number;
+  /** Round trip time in milliseconds */
+  rtt: number;
+};
+
 export type ConnectionStats = {
   /** Quality bucket reported by the SFU */
   quality: ConnectionQuality;
@@ -20,10 +27,18 @@ export type ConnectionStats = {
   loss?: number;
   /** Jitter in milliseconds, if known */
   jitter?: number;
+  /** Recent round trip times, oldest first */
+  history: readonly RttSample[];
 };
 
 /** How often we poll `getRTCStatsReport` */
 const POLL_INTERVAL = 2000;
+
+/**
+ * How many RTT samples we keep around; at one sample every two seconds this
+ * covers the last five minutes, which is what the connection popover graphs.
+ */
+const HISTORY_LIMIT = 150;
 
 /**
  * Cumulative counters from the previous poll, used to turn the monotonically
@@ -74,7 +89,10 @@ function findStatsTrack(
 function readReport(
   report: RTCStatsReport,
   previous: Cumulative | undefined,
-): { stats: Omit<ConnectionStats, "quality">; cumulative?: Cumulative } {
+): {
+  stats: Omit<ConnectionStats, "quality" | "history">;
+  cumulative?: Cumulative;
+} {
   let rtt: number | undefined;
   let jitter: number | undefined;
   let lost: number | undefined;
@@ -146,6 +164,7 @@ function readReport(
 export function useConnectionStats(participant: Participant) {
   const [stats, setStats] = createSignal<ConnectionStats>({
     quality: participant.connectionQuality,
+    history: [],
   });
 
   onMount(() => {
@@ -157,12 +176,26 @@ export function useConnectionStats(participant: Participant) {
     let previous: Cumulative | undefined;
     let cancelled = false;
 
+    // Ring buffer of round trip times; kept outside of the signal so that a
+    // poll which produces no RTT does not throw away the existing history.
+    const history: RttSample[] = [];
+
+    /**
+     * Record a round trip time sample, dropping the oldest once full
+     */
+    function record(rtt: number | undefined) {
+      if (typeof rtt !== "number" || !Number.isFinite(rtt)) return;
+      history.push({ timestamp: Date.now(), rtt });
+      if (history.length > HISTORY_LIMIT) history.shift();
+    }
+
     const poll = async () => {
       const track = findStatsTrack(participant);
       if (!track) {
         previous = undefined;
         setStats((current) => ({
           quality: current.quality,
+          history: current.history,
         }));
         return;
       }
@@ -179,14 +212,23 @@ export function useConnectionStats(participant: Participant) {
 
       if (!report) {
         previous = undefined;
-        setStats((current) => ({ quality: current.quality }));
+        setStats((current) => ({
+          quality: current.quality,
+          history: current.history,
+        }));
         return;
       }
 
       const { stats: sample, cumulative } = readReport(report, previous);
       previous = cumulative;
 
-      setStats((current) => ({ quality: current.quality, ...sample }));
+      record(sample.rtt);
+
+      setStats((current) => ({
+        quality: current.quality,
+        ...sample,
+        history: [...history],
+      }));
     };
 
     void poll();
