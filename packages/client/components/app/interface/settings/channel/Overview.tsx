@@ -1,5 +1,5 @@
 import { createFormControl, createFormGroup } from "solid-forms";
-import { Match, Show, Switch, createSignal, onMount } from "solid-js";
+import { Match, Show, Switch } from "solid-js";
 
 import { Trans, useLingui } from "@lingui/solid/macro";
 import type { API } from "stoat.js";
@@ -14,7 +14,7 @@ import {
   DEFAULT_AUDIO_BITRATE,
   MAX_AUDIO_BITRATE,
   MIN_AUDIO_BITRATE,
-  getChannelVoiceInfo,
+  getChannelMaxBitrate,
   useVoice,
 } from "@revolt/rtc";
 import {
@@ -45,13 +45,10 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
   const isVoiceChannel = props.channel.isVoice;
 
   /**
-   * Voice information as currently stored on the channel; `max_bitrate` is not
-   * hydrated by stoat.js, so it is fetched from the API.
+   * Bitrate currently stored on the channel; stoat.js hydrates it and keeps it
+   * up to date through `ChannelUpdate`, so no fetch is needed.
    */
-  const [voiceInfo, setVoiceInfo] = createSignal<{
-    max_users?: number | null;
-    max_bitrate?: number | null;
-  }>();
+  const channelBitrate = () => getChannelMaxBitrate(props.channel);
 
   /* eslint-disable solid/reactivity */
   // we want to take the initial value only
@@ -64,23 +61,11 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
     slowmode: createFormControl<string>(
       props.channel.slowmode.toString() ?? "0",
     ),
-    bitrate: createFormControl<number>(DEFAULT_AUDIO_BITRATE),
+    bitrate: createFormControl<number>(
+      getChannelMaxBitrate(props.channel) ?? DEFAULT_AUDIO_BITRATE,
+    ),
   });
   /* eslint-enable solid/reactivity */
-
-  onMount(() => {
-    if (!isVoiceChannel) return;
-
-    getChannelVoiceInfo(client(), props.channel.id)
-      .then((info) => {
-        setVoiceInfo(info);
-        editGroup.controls.bitrate.setValue(
-          info?.max_bitrate ?? DEFAULT_AUDIO_BITRATE,
-        );
-        editGroup.controls.bitrate.markDirty(false);
-      })
-      .catch(() => void 0);
-  });
 
   function onReset() {
     editGroup.controls.name.setValue(props.channel.name);
@@ -90,7 +75,7 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
       props.channel.slowmode.toString() ?? "0",
     );
     editGroup.controls.bitrate.setValue(
-      voiceInfo()?.max_bitrate ?? DEFAULT_AUDIO_BITRATE,
+      channelBitrate() ?? DEFAULT_AUDIO_BITRATE,
     );
     editGroup.controls.bitrate.markDirty(false);
   }
@@ -145,7 +130,7 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
       // `voice` is typed without `max_bitrate` in stoat-api; keep the other
       // voice fields intact when patching
       changes.voice = {
-        ...voiceInfo(),
+        max_users: props.channel.voice?.maxUsers,
         max_bitrate: bitrate,
       } as NonNullable<API.DataEditChannel["voice"]>;
     }
@@ -153,7 +138,6 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
     await props.channel.edit(changes);
 
     if (bitrateChanged) {
-      setVoiceInfo((info) => ({ ...info, max_bitrate: bitrate }));
       editGroup.controls.bitrate.markDirty(false);
       await voice.updateChannelMaxBitrate(props.channel.id, bitrate);
     }
@@ -228,7 +212,7 @@ export default function ChannelOverview(props: ChannelSettingsProps) {
                 );
                 editGroup.controls.bitrate.markDirty(
                   Number(event.currentTarget.value) !==
-                    (voiceInfo()?.max_bitrate ?? DEFAULT_AUDIO_BITRATE),
+                    (channelBitrate() ?? DEFAULT_AUDIO_BITRATE),
                 );
               }}
             />

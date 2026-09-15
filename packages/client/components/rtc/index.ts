@@ -7,7 +7,6 @@ export {
   AUDIO_BITRATE_WARN_THRESHOLD,
   DEFAULT_AUDIO_BITRATE,
   getChannelMaxBitrate,
-  getChannelVoiceInfo,
   MAX_AUDIO_BITRATE,
   MIN_AUDIO_BITRATE,
 } from "./bitrate";

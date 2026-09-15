@@ -23,9 +23,9 @@ import {
   VideoEncoding,
   VideoPresets,
 } from "livekit-client";
-import { Channel, Client } from "stoat.js";
+import { Channel } from "stoat.js";
 
-import { SoundController, useClient, useSound } from "@revolt/client";
+import { SoundController, useSound } from "@revolt/client";
 import { useInstance } from "@revolt/instance";
 import { ModalController, useModals } from "@revolt/modal";
 import { useState } from "@revolt/state";
@@ -41,7 +41,6 @@ import {
   applyLiveAudioBitrate,
   audioPublishOptions,
   getChannelMaxBitrate,
-  setCachedChannelMaxBitrate,
 } from "./bitrate";
 import { InRoom } from "./components/InRoom";
 import { RoomAudioManager } from "./components/RoomAudioManager";
@@ -98,7 +97,6 @@ class Voice {
 
   private sound: SoundController;
   private device: Device;
-  private getClient: Accessor<Client>;
 
   /**
    * Audio bitrate configured on the current channel, in bits per second
@@ -116,12 +114,10 @@ class Voice {
     modals: ModalController,
     sound: SoundController,
     device: Device,
-    getClient: Accessor<Client>,
   ) {
     this.#settings = voiceSettings;
     this.sound = sound;
     this.device = device;
-    this.getClient = getClient;
 
     const [channel, setChannel] = createSignal<Channel>();
     this.channel = channel;
@@ -169,6 +165,9 @@ class Voice {
 
     // Setup settings listeners
     this.settingsListeners();
+
+    // Track remote changes to the channel bitrate
+    this.bitrateListener();
   }
 
   // Dynamically set echo cancellation and gain control when the settings are changed
@@ -220,12 +219,28 @@ class Voice {
     });
   }
 
+  /**
+   * React to the current channel's bitrate changing in the store.
+   *
+   * `ChannelUpdate` keeps `voice.maxBitrate` current, so a change made by
+   * another user while we are in the call is applied live here.
+   */
+  private bitrateListener() {
+    createEffect(() => {
+      const bitrate = getChannelMaxBitrate(this.channel());
+      if (typeof bitrate !== "number" || bitrate === this.#maxBitrate) return;
+
+      this.#maxBitrate = bitrate;
+      applyLiveAudioBitrate(this.getMicrophoneTrack(), bitrate);
+    });
+  }
+
   async connect(channel: Channel, auth?: { url: string; token: string }) {
     this.disconnect();
 
     this.device.setWakeLocked();
 
-    this.#maxBitrate = await getChannelMaxBitrate(this.getClient(), channel.id);
+    this.#maxBitrate = getChannelMaxBitrate(channel);
 
     const room = new Room({
       audioCaptureDefaults: {
@@ -711,8 +726,6 @@ class Voice {
    * @param bitrate Bitrate in bits per second, undefined for server default
    */
   async updateChannelMaxBitrate(channelId: string, bitrate?: number) {
-    setCachedChannelMaxBitrate(channelId, bitrate);
-
     if (this.channel()?.id !== channelId) return;
 
     this.#maxBitrate = bitrate;
@@ -750,8 +763,7 @@ export function VoiceContext(props: { children: JSX.Element }) {
   const modals = useModals();
   const sound = useSound();
   const device = useDevice();
-  const client = useClient();
-  const voice = new Voice(state.voice, modals, sound, device, client);
+  const voice = new Voice(state.voice, modals, sound, device);
 
   return (
     <voiceContext.Provider value={voice}>

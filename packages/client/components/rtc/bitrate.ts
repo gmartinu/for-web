@@ -2,7 +2,7 @@ import type {
   LocalTrackPublication,
   TrackPublishOptions,
 } from "livekit-client";
-import type { Client } from "stoat.js";
+import type { Channel } from "stoat.js";
 
 /**
  * Bitrate range exposed to users (bits per second of Opus audio).
@@ -20,28 +20,9 @@ export const AUDIO_BITRATE_STEP = 8000;
 export const AUDIO_BITRATE_WARN_THRESHOLD = 64000;
 
 /**
- * `voice` object as sent by the API.
- *
- * NB. `max_bitrate` is not exposed by stoat.js: the channel hydration maps
- * `voice` to `{ maxUsers }` only, so the field is dropped from the store. We
- * therefore read it straight from the API here, in a single place, instead of
- * spreading casts around. Once stoat.js hydrates `max_bitrate`, this module
- * should read it from the channel object instead.
- */
-export type VoiceInformationWithBitrate = {
-  max_users?: number | null;
-  max_bitrate?: number | null;
-};
-
-/**
  * Default bitrate presented in the UI when the channel has none configured
  */
 export const DEFAULT_AUDIO_BITRATE = 64000;
-
-/**
- * Last known bitrate per channel id
- */
-const cache = new Map<string, number | undefined>();
 
 /**
  * Clamp a bitrate to the accepted range
@@ -51,57 +32,18 @@ export function clampAudioBitrate(value: number) {
 }
 
 /**
- * Read the last known bitrate for a channel without hitting the network
- */
-export function cachedChannelMaxBitrate(channelId: string) {
-  return cache.get(channelId);
-}
-
-/**
- * Record a bitrate locally (e.g. right after saving channel settings)
- */
-export function setCachedChannelMaxBitrate(
-  channelId: string,
-  value?: number | null,
-) {
-  cache.set(channelId, value ?? undefined);
-}
-
-/**
- * Fetch the configured audio bitrate of a channel
- * @param client Client
- * @param channelId Channel id
+ * Read the configured audio bitrate of a channel.
+ *
+ * stoat.js hydrates `voice.maxBitrate` from the API and keeps it up to date
+ * through `ChannelUpdate`, so this is a synchronous read off the store.
+ *
+ * @param channel Channel
  * @returns Bitrate in bits per second, or undefined for the server default
  */
-export async function getChannelVoiceInfo(
-  client: Client,
-  channelId: string,
-): Promise<VoiceInformationWithBitrate | undefined> {
-  const channel = await client.api.get(`/channels/${channelId as ""}`);
-
-  const voice = (channel as { voice?: VoiceInformationWithBitrate | null })
-    .voice;
-
-  cache.set(channelId, voice?.max_bitrate ?? undefined);
-  return voice ?? undefined;
-}
-
-/**
- * Fetch the configured audio bitrate of a channel
- * @param client Client
- * @param channelId Channel id
- * @returns Bitrate in bits per second, or undefined for the server default
- */
-export async function getChannelMaxBitrate(
-  client: Client,
-  channelId: string,
-): Promise<number | undefined> {
-  try {
-    const voice = await getChannelVoiceInfo(client, channelId);
-    return voice?.max_bitrate ?? undefined;
-  } catch {
-    return cache.get(channelId);
-  }
+export function getChannelMaxBitrate(
+  channel: Channel | undefined,
+): number | undefined {
+  return channel?.voice?.maxBitrate ?? undefined;
 }
 
 /**
